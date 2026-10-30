@@ -412,7 +412,7 @@
 
         <h4>CAIXAS</h4>
         Caem de paraquedas o tempo todo. Trazem vida, munição, bombonas — e, com sorte,
-        a <b>NUKE</b>. Ande até ela para pegar, ou <b>exploda a caixa</b> antes do inimigo chegar.
+        a <b>NUKE</b> ou o <b>JERICÓ</b>. Ande até ela para pegar, ou <b>exploda a caixa</b> antes do inimigo chegar.
 
         <h4>DICAS DE VETERANO</h4>
         • Errou por pouco? Mude só 2 de força, não 20.<br>
@@ -689,8 +689,13 @@ const ARMAS = [
   { nome:"Terremoto",   desc:"derruba a lua inteira",     dano:22, raio:0,  cor:"#8b7f9e", tipo:"terremoto", usos:2 },
   { nome:"Meteoros",    desc:"9 pedras do espaço",        dano:24, raio:34, cor:"#ff8c42", tipo:"meteoros",  usos:2 },
   { nome:"Gelo Total",  desc:"congela 2 rodadas, não fere", dano:0, raio:70, cor:"#a0e8ff", tipo:"gelototal", usos:3 },
-  { nome:"Trado",       desc:"cava um poço fundo",        dano:30, raio:24, cor:"#6b4a2f", tipo:"trado",     usos:3 }
+  { nome:"Trado",       desc:"cava um poço fundo",        dano:30, raio:24, cor:"#6b4a2f", tipo:"trado",     usos:3 },
+  // ---- índice 33: JERICÓ. Só cai de caixa, como a NUKE. ----
+  { nome:"Jericó", desc:"míssil que se abre em 50", dano:4, raio:20, cor:"#ff6bd6", tipo:"jerico", jerico:true }
 ];
+// os 50 mísseis pequenos do Jericó: 2 de dano exato cada um
+const MINI_MISSIL = { nome:"Míssil", desc:"", dano:2, raio:12, cor:"#ff6bd6", tipo:"normal", danoFixo:2 };
+const IDX_JERICO = ARMAS.findIndex(a => a.jerico);
 
 const DANO_DA_POCA    = 9;   // por rodada, em quem pisar
 const DANO_DO_VENENO  = 11;  // por rodada, em quem foi envenenado
@@ -704,7 +709,8 @@ const CARGAS = [
   { tipo:"nuke",    chance:.10, valor:1,  aviso:"☢️ ACHOU A NUKE! ☢️", cor:"#ffe066" },
   { tipo:"vida",    chance:.35, valor:30, aviso:"KIT MÉDICO! +30",  cor:"#3ddc84" },
   { tipo:"bombona", chance:.25, valor:2,  aviso:"2 BOMBONAS!",      cor:"#ff4d4d" },
-  { tipo:"municao", chance:.30, valor:3,  aviso:"MUNIÇÃO EXTRA!",   cor:"#ffb03a" }
+  { tipo:"jerico",  chance:.05, valor:1,  aviso:"🚀 ACHOU O JERICÓ! 🚀", cor:"#ff6bd6" },
+  { tipo:"municao", chance:.25, valor:3,  aviso:"MUNIÇÃO EXTRA!",   cor:"#ffb03a" }
 ];
 let CHANCE_DE_CAIXA = 1;
 const CAIXA_NORMAL = 1;
@@ -1065,7 +1071,7 @@ function novoJogo(){
     const x = L * (i + 1) / (numJogadores + 1);
     jogadores.push({
       x, vida:0, dir: x < L/2 ? 1 : -1, ang:45, pot:55, arma:0,
-      comb:COMB_MAX, bombonas:0,
+      comb:COMB_MAX, bombonas:0, jericos:0,
       cor: CORES[cores[i]].cor, corEsc: CORES[cores[i]].esc, nome: nomes[i]
     });
   }
@@ -1085,6 +1091,7 @@ function novoJogo(){
     // no beta e no hackeado já vêm carregadas
     j.nukes    = hackeado ? 3 : (sandboxBeta ? 99 : 0);
     j.bombonas = hackeado ? 5 : (sandboxBeta ? 99 : 0);
+    j.jericos  = hackeado ? 1 : (sandboxBeta ? 99 : 0);
     if(hackeado){
       j.vidaMax = VIDA_HACKEADA;                     // todo mundo com a mesma vida
       j.combMax = Math.round(j.combMax * 2.5);
@@ -1154,7 +1161,7 @@ function explodir(x, y, arma, poder=1){
     const d = Math.hypot(j.x-x, centroY(j)-y);
     if(d < arma.raio*2.1){
       const forca = 1 - d/(arma.raio*2.1);
-      let dano = Math.round(arma.dano*forca*poder);
+      let dano = arma.danoFixo ? arma.danoFixo : Math.round(arma.dano*forca*poder);
       if(j.escudo){                                   // escudo aguenta o tranco
         dano = Math.round(dano*0.3);
         j.escudo = false;
@@ -1291,6 +1298,7 @@ function armaDoComputador(j, nivel){
   // esperto guarda a suprema pra quando o inimigo estiver fraco
   const alvo = jogadores[1-jogadores.indexOf(j)];
   if(j.nukes > 0 && (nivel.esperto || Math.random()<0.5)) return 19;   // achou? usa!
+  if(j.jericos > 0 && (nivel.esperto || Math.random()<0.5)) return IDX_JERICO;
   if(j.bombonas > 0) return 4;                         // bombona nunca se desperdiça
   const uteis = arsenalDe(j).filter(i =>
     ARMAS[i].dano > 0 && (!ARMAS[i].usos || j.municao[i] > 0));
@@ -1562,6 +1570,10 @@ function passoCaixas(){
           tremor = Math.max(tremor, 10);
         }
         else if(c.carga.tipo === 'bombona') j.bombonas += c.carga.valor;
+        else if(c.carga.tipo === 'jerico'){
+          j.jericos += c.carga.valor;
+          flutuantes.push({x:j.x, y:j.y-70, txt:'🚀 JERICÓ!', cor:'#ff6bd6', vida:1.8, tam:30});
+        }
         else {                                        // recarrega uma arma sorteada
           const recarregaveis = arsenalDe(j).filter(k => ARMAS[k].usos);
           const k = recarregaveis[Math.floor(Math.random()*recarregaveis.length)];
@@ -1647,6 +1659,9 @@ function atirar(){
   } else if(ARMAS[armaSel].suprema){
     if(j.nukes <= 0){ avisar('A NUKE JÁ FOI USADA!'); return; }
     j.nukes--;
+  } else if(ARMAS[armaSel].jerico){
+    if(j.jericos <= 0){ avisar('SEM JERICÓ!'); return; }
+    j.jericos--;
   } else if(ARMAS[armaSel].usos){
     if(!j.municao[armaSel]){ avisar('SEM MUNIÇÃO!'); return; }
     j.municao[armaSel]--;
@@ -1716,6 +1731,7 @@ function atirar(){
   if(sandbox || sandboxBeta){ /* a arma escolhida continua selecionada */ }
   else if(ARMAS[armaSel].especial && j.bombonas<=0) armaSel = arsenalDe(j)[0];
   else if(ARMAS[armaSel].suprema && j.nukes<=0) armaSel = arsenalDe(j)[0];
+  else if(ARMAS[armaSel].jerico && j.jericos<=0) armaSel = arsenalDe(j)[0];
   else if(ARMAS[armaSel].usos && !j.municao[armaSel]) armaSel = arsenalDe(j)[0];
   if(ARMAS[armaSel].tipo === 'duplo'){          // o segundo míssil sai junto, mais aberto
     balas.push({ ...bala, x: bala.x, y: bala.y - 8,
@@ -1753,6 +1769,17 @@ function passoBalas(){
       }
       b.x  += b.vx/4;  b.y  += b.vy/4;
 
+      if(b.arma.tipo==="jerico" && !b.dividiu && b.vy>0){
+        b.dividiu = true;
+        for(let k=0;k<50;k++){
+          const vx = b.vx + (Math.random()-.5)*7;
+          const vy = b.vy*0.6 + Math.random()*2.2;
+          balas.push({x:b.x, y:b.y, vx, vy, vx0:vx, ventoAcc:0, arma:MINI_MISSIL,
+                      poder:b.poder, dono:b.dono, dividiu:true, rastro:[], saiu:true});
+        }
+        particulas.push({x:b.x, y:b.y, vx:0, vy:0, vida:.4, cor:"#ff6bd6"});
+        tremor = Math.max(tremor, 4);
+      }
       if(b.arma.tipo==="napalm" && !b.dividiu && b.vy>0){
         b.dividiu=true;
         for(const desvio of [-3.2,-1.6, 1.6, 3.2]){
@@ -3032,6 +3059,10 @@ function atualizarPainel(){
       const n = j.bombonas;
       b.innerHTML = `${pos+1}. Bombona <small>${n>0 ? 'você tem '+n : 'só cai de paraquedas'}</small>`;
       b.classList.toggle('vazia', n<=0);
+    } else if(ARMAS[idx].jerico){
+      const n = j.jericos;
+      b.innerHTML = `${pos+1}. 🚀 Jericó <small>${n>0 ? 'você tem '+n+'!' : 'só cai de caixa'}</small>`;
+      b.classList.toggle('vazia', n<=0);
     } else if(ARMAS[idx].suprema){
       const n = j.nukes;
       b.innerHTML = `${pos+1}. ☢️ NUKE <small>${n>0 ? 'você tem '+n+'!' : 'só cai de caixa'}</small>`;
@@ -3048,13 +3079,14 @@ function atualizarPainel(){
   if(sandbox || sandboxBeta) qtd = ' ∞';
   else if(a.especial) qtd = ' x' + j.bombonas;
   else if(a.suprema)  qtd = ' x' + j.nukes;
+  else if(a.jerico)   qtd = ' x' + j.jericos;
   else if(a.usos)     qtd = ' x' + (j.municao[armaSel] || 0);
   document.getElementById('armaNome').textContent = (a.suprema ? '☢️ NUKE' : a.nome) + qtd;
 }
 
 const caixaArmas = document.getElementById('armas');
 
-function listaDoJogador(){ return [...arsenalDe(jogadores[vez]), 4, 19]; }   // 4 = Bombona · 19 = NUKE
+function listaDoJogador(){ return [...arsenalDe(jogadores[vez]), 4, 19, IDX_JERICO]; }   // 4 = Bombona · 19 = NUKE · Jericó
 
 function montarArsenal(){
   caixaArmas.innerHTML = '';
