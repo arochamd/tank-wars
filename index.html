@@ -1936,14 +1936,20 @@ function terminarPartida(){
     ? `CPU ${NIVEIS[j.ia].nome} (${j.modelo.nome})`
     : nomes[jogadores.indexOf(j)];
 
+  // Só conta para desbloquear tanques a vitória do jogador humano contra
+  // computador NORMAL (nível 1). Vitória da CPU, entre humanos, ou contra
+  // Fácil/Difícil/Mestre não entra na contagem.
+  const NIVEL_NORMAL = 1;
+  const cpus = jogadores.filter(j => j.ia !== null);
+  const conta = !!vencedor && vencedor.ia === null
+             && cpus.length > 0 && cpus.every(j => j.ia === NIVEL_NORMAL);
+
   let liberou = null;
-  if(vencedor){
+  if(conta){
     const posto = jogadores.indexOf(vencedor);
-    if(posto >= 0){
-      const antes = proximoTanque();
-      vitorias[posto]++; guardarVitorias();
-      if(antes >= 0 && tanqueLiberado(antes)) liberou = TANQUES[antes];
-    }
+    const antes = proximoTanque();
+    vitorias[posto]++; guardarVitorias();
+    if(antes >= 0 && tanqueLiberado(antes)) liberou = TANQUES[antes];
   }
 
   let texto = vencedor
