@@ -9,7 +9,7 @@
    Quando mudar algo grande no jogo, aumente o número da VERSAO
    pra jogar fora as cópias velhas.
    ========================================================= */
-const VERSAO = 'tank-wars-v7';
+const VERSAO = 'tank-wars-v8';
 const ARQUIVOS = [
   './',
   './index.html',
@@ -39,6 +39,22 @@ self.addEventListener('activate', e => {
 // cada pedido de arquivo passa por aqui
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+
+  // A página principal (e o próprio index.html) busca primeiro na internet,
+  // assim a versão nova aparece logo. Sem internet, usa a cópia guardada.
+  const ehPagina = e.request.mode === 'navigate' || /\/(index\.html)?$/.test(new URL(e.request.url).pathname);
+  if (ehPagina) {
+    e.respondWith(
+      fetch(e.request)
+        .then(resp => {
+          if (resp && resp.ok) caches.open(VERSAO).then(c => c.put(e.request, resp.clone()));
+          return resp;
+        })
+        .catch(() => caches.match(e.request, { ignoreSearch: true }).then(g => g || caches.match('./index.html')))
+    );
+    return;
+  }
+
   e.respondWith(
     caches.open(VERSAO).then(async caixa => {
       const guardado = await caixa.match(e.request, { ignoreSearch: true });
