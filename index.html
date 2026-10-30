@@ -2,8 +2,17 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>TANK WARS — XSTAR</title>
+<!-- app instalável: ícone, cor e jeito de abrir quando vira "app" no celular -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icone-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1b1030">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tank Wars">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
@@ -254,10 +263,117 @@
   :fullscreen body, body:fullscreen{padding:0;justify-content:center}
   body:fullscreen{--hud:188px}
   body:fullscreen .dica{display:none}
+
+  /* =========================================================
+     VERSÃO CELULAR
+     Só vale quando o corpo tem a classe .celular (posta pelo
+     script logo no começo do <body>). No computador nada muda.
+     ========================================================= */
+  body.celular{padding:0;min-height:100dvh;overflow:hidden;overscroll-behavior:none}
+  body.celular button{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+  body.celular .dica{display:none}
+
+  /* a arena ocupa a tela inteira, centralizada */
+  body.celular .palco{position:fixed;inset:0;max-width:none;width:100vw;height:100dvh;
+    display:flex;align-items:center;justify-content:center}
+  body.celular canvas{width:min(100vw, calc(100dvh * 2.222));border-radius:0;box-shadow:none}
+
+  /* as telas de menu cobrem a tela toda e rolam se não couberem */
+  body.celular .aviso{position:fixed;inset:0;z-index:20;border-radius:0;padding:14px 12px;
+    padding-left:max(12px, env(safe-area-inset-left));padding-right:max(12px, env(safe-area-inset-right))}
+  /* centraliza sem cortar o topo quando o conteúdo é maior que a tela */
+  body.celular #telaInicio.on{align-items:flex-start}
+  body.celular .aviso > div{margin:auto 0}
+  @media (max-height:520px){
+    body.celular .titulao.gigante{font-size:clamp(34px, 14vh, 80px)}
+    body.celular .subtitulo{margin:2px 0 6px}
+    body.celular .jogarzao{padding:10px 48px;margin-top:8px}
+    body.celular .menu-botoes{margin-top:14px}
+    body.celular .creditos{margin-top:12px}
+    body.celular .menu-bt{padding:9px 12px}
+  }
+
+  /* botões do canto, menores */
+  body.celular .sair-btn{font-size:16px;padding:6px 8px;top:6px;left:max(6px, env(safe-area-inset-left))}
+  body.celular .sair-btn.trapaca{top:44px}
+  body.celular .sair-btn.audio{top:82px}
+  body.celular .sair-btn.cheia{left:auto;right:max(6px, env(safe-area-inset-right))}
+  /* tela cheia e som ficam por cima dos menus (no celular são úteis já no início) */
+  body.celular .sair-btn.cheia, body.celular .sair-btn.audio{z-index:50}
+  body.celular .sair-btn.confirmando{font-size:11px}
+  body.celular .sandbar{top:6px;right:52px}
+  body.celular .sandbar button{font-size:14px;padding:5px 7px}
+  body.celular .sandbar .destaque{font-size:11px}
+
+  /* placar fininho por cima da arena */
+  body.celular .placar{position:fixed;top:4px;left:56px;right:56px;width:auto;z-index:6;
+    margin:0;gap:5px;pointer-events:none}
+  body.celular .jogador{padding:3px 7px;border-radius:9px;border-width:2px;
+    background:rgba(44,26,77,.72);backdrop-filter:blur(3px)}
+  body.celular .jogador.ativo{transform:none}
+  body.celular .jogador h2{font-size:9px;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.celular .barra{height:9px}
+  body.celular .barra em{font-size:7px}
+  body.celular .barra.comb{height:3px;margin-top:2px}
+  body.celular .vento{min-width:52px;padding:3px 6px;border-radius:9px;background:rgba(44,26,77,.72)}
+  body.celular .vento b{font-size:8px}
+  body.celular .vento span{font-size:13px}
+
+  /* controles flutuando embaixo: andar e mira na esquerda, arma e tiro na direita */
+  body.celular .painel{position:fixed;left:0;right:0;bottom:0;z-index:7;margin:0;max-width:none;
+    padding:0 max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+    gap:6px;flex-wrap:nowrap;align-items:flex-end;pointer-events:none}
+  body.celular .painel > *{pointer-events:auto}
+  body.celular .caixa{padding:5px 6px;border-radius:12px;background:rgba(44,26,77,.78);backdrop-filter:blur(3px)}
+  body.celular .caixa > b{display:none}
+  body.celular .passo{font-size:18px;padding:12px 14px}
+  body.celular .mira{gap:4px;flex-wrap:nowrap}
+  body.celular .dial{min-width:44px}
+  body.celular .dial .num{font-size:19px}
+  body.celular .dial .lbl{font-size:8px}
+  body.celular .setas button{padding:6px 12px;font-size:13px}
+  body.celular #caixaArsenal{display:none}
+  body.celular .arma-bt{display:flex}
+  body.celular .escudo-btn{font-size:19px;padding:12px 10px;border-radius:12px}
+  body.celular .fogo#atirar{flex:0 0 auto;min-width:0;font-size:16px;padding:16px 18px;border-radius:12px}
+
+  /* lista de armas abre por cima, como uma gaveta */
+  body.celular.armas-abertas #caixaArsenal{display:block;position:fixed;z-index:30;
+    left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    width:min(560px, calc(100vw - 16px));max-height:calc(100dvh - 110px);overflow-y:auto;
+    background:rgba(28,16,52,.97);border:2px solid #4a4066;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+  body.celular.armas-abertas #caixaArsenal > b{display:block}
+  body.celular .armas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  body.celular .arma{min-width:0;padding:9px 10px}
+
+  /* botão que mostra a arma escolhida (só no celular) */
+  .arma-bt{display:none;margin-left:auto;flex-direction:column;align-items:flex-start;
+    line-height:1.1;padding:8px 12px;border-radius:12px;max-width:34vw;
+    background:rgba(67,43,110,.88);border:2px solid #8d7fb0;text-align:left}
+  .arma-bt small{font-weight:700;font-size:9px;color:#b9a7e0;letter-spacing:1px}
+  .arma-bt span{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  body.armas-abertas .arma-bt{background:var(--lava);color:#2b0f04;border-color:var(--lava-clara)}
+  body.armas-abertas .arma-bt small{color:#4a1f0d}
+
+  /* em pé não dá pra jogar direito: pede pra girar */
+  .gire{display:none;position:fixed;inset:0;z-index:60;background:rgba(18,10,38,.96);
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+  .gire div{font-size:64px;animation:gira 2s ease-in-out infinite}
+  .gire p{font-family:'Bungee',cursive;font-size:18px;letter-spacing:1px;color:var(--lava-clara);margin:18px 0 6px}
+  .gire small{color:#c9bce8;font-size:14px}
+  @keyframes gira{0%,20%{transform:rotate(0)}50%,70%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+  @media (orientation:portrait){ body.celular.jogando .gire{display:flex} }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+<script>
+  /* Celular ou tablet pequeno? (tela de toque e lado menor que 820px)
+     Se for, o corpo ganha a classe .celular e o CSS lá de cima muda o visual. */
+  if(matchMedia('(pointer:coarse)').matches && Math.min(screen.width, screen.height) < 820)
+    document.body.classList.add('celular');
+</script>
+<div class="gire"><div>📱</div><p>GIRE O CELULAR</p><small>Tank Wars é jogado deitado</small></div>
 
 <div class="placar" id="placar"></div>
 
@@ -539,11 +655,12 @@
     </div>
   </div>
 
-  <div class="caixa" style="flex:1 1 320px">
+  <div class="caixa" id="caixaArsenal" style="flex:1 1 320px">
     <b>ARSENAL</b>
     <div class="armas" id="armas"></div>
   </div>
 
+  <button class="arma-bt" id="btArma"><small>ARMA ▴</small><span id="armaNome">Pedrada</span></button>
   <button class="escudo-btn" id="escudo">🛡️<span id="escudoQtd">1</span></button>
   <button class="fogo" id="atirar">ATIRAR 🔥</button>
 </div>
@@ -2969,6 +3086,14 @@ function atualizarPainel(){
       b.classList.toggle('vazia', n<=0);
     }
   });
+  // botão de arma do celular: mostra a escolhida e quantas sobram
+  const a = ARMAS[armaSel], j = jogadores[vez];
+  let qtd = '';
+  if(sandbox || sandboxBeta) qtd = ' ∞';
+  else if(a.especial) qtd = ' x' + j.bombonas;
+  else if(a.suprema)  qtd = ' x' + j.nukes;
+  else if(a.usos)     qtd = ' x' + (j.municao[armaSel] || 0);
+  document.getElementById('armaNome').textContent = (a.suprema ? '☢️ NUKE' : a.nome) + qtd;
 }
 
 const caixaArmas = document.getElementById('armas');
@@ -2983,18 +3108,35 @@ function montarArsenal(){
     b.className = 'arma' + (a.especial ? ' especial' : '');
     b.dataset.idx = idx;
     b.innerHTML = `${pos+1}. ${a.nome}<small>${a.desc}</small>`;
-    b.onclick = ()=>{ armaSel = idx; atualizarPainel(); };
+    b.onclick = ()=>{ armaSel = idx; document.body.classList.remove('armas-abertas'); atualizarPainel(); };
     caixaArmas.appendChild(b);
   });
   atualizarPainel();
 }
 
+// Segurar o botão repete: primeiro um passo, uma pausa, e depois vai sozinho.
+// Antes era um toque = um passo, e no celular cansava o dedo.
+function segurarRepete(b, passo){
+  let espera = null, timer = null;
+  const para = ()=>{ clearTimeout(espera); clearInterval(timer); espera = timer = null; };
+  b.addEventListener('pointerdown', e=>{
+    e.preventDefault(); para();
+    passo();
+    espera = setTimeout(()=>{ timer = setInterval(passo, 60); }, 320);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=> b.addEventListener(ev, para));
+  b.addEventListener('contextmenu', e=> e.preventDefault());   // segurar no celular abria menu
+}
 document.querySelectorAll('[data-ang]').forEach(b=>{
-  b.onclick=()=>{ angulo=Math.max(0,Math.min(90, angulo+ +b.dataset.ang*2)); atualizarPainel(); };
+  segurarRepete(b, ()=>{ angulo=Math.max(0,Math.min(90, angulo+ +b.dataset.ang*2)); atualizarPainel(); });
 });
 document.querySelectorAll('[data-pot]').forEach(b=>{
-  b.onclick=()=>{ potencia=Math.max(5,Math.min(100, potencia+ +b.dataset.pot*3)); atualizarPainel(); };
+  segurarRepete(b, ()=>{ potencia=Math.max(5,Math.min(100, potencia+ +b.dataset.pot*3)); atualizarPainel(); });
 });
+
+// ---- gaveta de armas (celular) ----
+document.getElementById('btArma').onclick = ()=> document.body.classList.toggle('armas-abertas');
+document.getElementById('tela').addEventListener('pointerdown', ()=> document.body.classList.remove('armas-abertas'));
 // segurar o botão anda continuamente
 document.querySelectorAll('[data-mover]').forEach(b=>{
   const dir = +b.dataset.mover;
@@ -3003,6 +3145,7 @@ document.querySelectorAll('[data-mover]').forEach(b=>{
   const para = ()=>{ clearInterval(timer); timer=null; };
   b.addEventListener('pointerdown', começa);
   ['pointerup','pointerleave','pointercancel'].forEach(ev=> b.addEventListener(ev, para));
+  b.addEventListener('contextmenu', e=> e.preventDefault());
 });
 
 // ---- encerrar a partida (com confirmação, pra não acabar sem querer) ----
@@ -3088,7 +3231,10 @@ document.querySelectorAll('[data-sb]').forEach(b=>{
 // ---- tela cheia ----
 function alternarTelaCheia(){
   if(!document.fullscreenElement){
-    document.documentElement.requestFullscreen().catch(()=>{});
+    document.documentElement.requestFullscreen()
+      .then(()=>{ if(document.body.classList.contains('celular') && screen.orientation && screen.orientation.lock)
+                    screen.orientation.lock('landscape').catch(()=>{}); })
+      .catch(()=>{});
   } else {
     document.exitFullscreen().catch(()=>{});
   }
@@ -3099,7 +3245,7 @@ document.addEventListener('fullscreenchange', ()=>{
 });
 
 document.getElementById('escudo').onclick = usarEscudo;
-document.getElementById('atirar').onclick = atirar;
+document.getElementById('atirar').onclick = ()=>{ document.body.classList.remove('armas-abertas'); atirar(); };
 document.getElementById('reiniciar').onclick = ()=>{
   emPartida = false; mostrarInterface();
   balas=[];
@@ -3830,6 +3976,11 @@ novoJogo();
 document.getElementById('selecao').classList.remove('on');
 mostrarInterface();
 loop();
+</script>
+<script>
+  // liga o ajudante que faz o jogo funcionar offline (só funciona em site https, como o GitHub Pages)
+  if('serviceWorker' in navigator && location.protocol === 'https:')
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
