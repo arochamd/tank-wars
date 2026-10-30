@@ -1999,12 +1999,14 @@ function pontosDaVitoria(){
 
 async function enviarPontuacao(apelido, pontos){
   try{
-    await fetch(SUPABASE_URL + '/rest/v1/ranking', {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/ranking', {
       method: 'POST',
       headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify({ apelido: String(apelido).slice(0, 12).toUpperCase(), pontos })
     });
-  }catch(e){ /* sem internet: a vitória não é enviada, mas o jogo segue */ }
+    if(r.ok) avisar('+' + pontos + ' PONTOS NO RANKING!');
+    else avisar('PONTOS NÃO ENVIADOS (erro ' + r.status + ')');
+  }catch(e){ avisar('PONTOS NÃO ENVIADOS (sem internet)'); }
 }
 
 // junta as linhas por apelido e devolve o top 10
