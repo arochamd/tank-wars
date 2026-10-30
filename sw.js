@@ -9,7 +9,7 @@
    Quando mudar algo grande no jogo, aumente o número da VERSAO
    pra jogar fora as cópias velhas.
    ========================================================= */
-const VERSAO = 'tank-wars-v6';
+const VERSAO = 'tank-wars-v7';
 const ARQUIVOS = [
   './',
   './index.html',

@@ -187,6 +187,9 @@
     background:#0e0620;border:2px dashed #8d7fb0;border-radius:10px;padding:8px 12px;text-decoration:none;
     overflow-wrap:anywhere}
   .copiado{font-size:12px;color:var(--musgo);font-weight:700;min-height:16px}
+  .lista-cacadores{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:5px}
+  .lista-cacadores li{font-size:13px;line-height:1.4;color:#d6cbec;background:#1a0f33;border-radius:8px;padding:6px 10px}
+  .lista-cacadores li b{color:#ffe066;font-family:'Bungee',cursive;font-size:12px;letter-spacing:.5px}
   .tabela-placar{max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
   .linha-placar{display:flex;justify-content:space-between;align-items:center;
     background:#241443;border-radius:12px;padding:10px 16px;font-size:15px;font-weight:900}
@@ -468,6 +471,12 @@
           <h4>🤖 CLAUDE</h4>
           <p>Programação, física e desenhos.<br>
           Escreveu o código a partir das ideias do XSTAR.</p>
+        </div>
+
+        <div class="bloco-cred">
+          <h4>🐛 CAÇADORES DE BUGS</h4>
+          <p>Quem achou e avisou um bug de verdade.</p>
+          <ul class="lista-cacadores" id="listaCacadores"></ul>
         </div>
 
         <div class="bloco-cred">
@@ -3686,6 +3695,37 @@ function montarPlacarVitorias(){
   rodape.textContent = total ? `${total} partidas disputadas` : 'nenhuma partida ainda';
   caixa.appendChild(rodape);
 }
+/* =========================================================
+   CAÇADORES DE BUGS
+   Quando um bug for confirmado, acrescente uma linha aqui:
+   { apelido: "NOME", bug: "o que a pessoa achou" }
+   Só entra quem reportou um bug que a gente conseguiu reproduzir.
+   Depois de editar, faça commit e push: o site atualiza sozinho.
+   ========================================================= */
+const CACADORES_DE_BUGS = [
+  // { apelido: "NOME", bug: "o que achou" },
+];
+
+function desenharCacadores(lista){
+  const ul = document.getElementById('listaCacadores');
+  ul.innerHTML = '';
+  if(lista.length === 0){
+    const li = document.createElement('li');
+    li.textContent = 'Ainda ninguém. Seja o primeiro!';
+    ul.appendChild(li);
+    return;
+  }
+  lista.forEach(c=>{
+    const li = document.createElement('li');
+    const quem = document.createElement('b');
+    quem.textContent = c.apelido;
+    li.appendChild(quem);
+    li.appendChild(document.createTextNode(' — ' + c.bug));
+    ul.appendChild(li);
+  });
+}
+desenharCacadores(CACADORES_DE_BUGS);
+
 // ---- suporte: e-mail pra avisar de bugs ----
 document.getElementById('btSuporte').onclick = ()=>
   document.getElementById('telaSuporte').classList.add('on');
