@@ -78,19 +78,14 @@
   .aviso.on{display:flex}
   /* estas duas telas abrem POR CIMA da tela de escolha.
      Sem isto elas abriam atrás dela e pareciam não funcionar. */
-  #telaDev.on, #telaFases.on, #telaTrapaca.on, #telaAjuda.on,
+  #telaDev.on, #telaFases.on, #telaAjuda.on,
   #telaPlacar.on, #telaCreditos.on{z-index:45}
   .adversario{margin-bottom:16px}
   .adversario b{font-family:'Bungee',cursive;font-size:11px;color:#b9a7e0;letter-spacing:1px;display:block;margin-bottom:7px}
   .linha-niveis{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
   .nivel{font-size:11px;padding:5px 8px}
   .nivel.sel{background:var(--musgo);color:#0c2b1a}
-  .campo-senha{display:flex;gap:6px;justify-content:center;align-items:center}
-  .campo-senha .nome-input{width:210px;text-transform:none}
-  .olho{font-size:17px;line-height:1;padding:7px 10px;background:#2c1a4d}
-  .olho.on{background:var(--musgo)}
   .dev-txt{font-size:13px;color:#c9bce8;margin:0 0 8px}
-  .dev-erro{font-size:12px;color:#ff6b6b;font-weight:700;min-height:16px;margin-top:6px}
   .dev-linha{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;text-align:left}
   .dev-linha label{font-size:12px;color:#c9bce8}
   .dev-linha label b{color:#ffe066;font-family:'Bungee',cursive;font-size:13px}
@@ -247,8 +242,7 @@
   /* Precisa vir DEPOIS de .sair-btn: as duas têm o mesmo peso e a última ganha.
      Antes estava em cima e os dois botões ficavam empilhados no canto esquerdo. */
   .sair-btn.cheia{left:auto;right:10px;font-size:18px}
-  .sair-btn.trapaca{top:56px;left:10px;font-size:18px}
-  .sair-btn.audio{top:102px;left:10px;font-size:18px}
+  .sair-btn.audio{top:56px;left:10px;font-size:18px}
   .escudo-btn{flex:0 0 auto;font-size:24px;padding:8px 16px;background:#1d4a63;line-height:1}
   .escudo-btn span{font-size:14px;vertical-align:super;margin-left:2px}
   .escudo-btn:hover{background:#2a6a8c}
@@ -295,8 +289,7 @@
 
   /* botões do canto, menores */
   body.celular .sair-btn{font-size:16px;padding:6px 8px;top:6px;left:max(6px, env(safe-area-inset-left))}
-  body.celular .sair-btn.trapaca{top:44px}
-  body.celular .sair-btn.audio{top:82px}
+  body.celular .sair-btn.audio{top:44px}
   body.celular .sair-btn.cheia{left:auto;right:max(6px, env(safe-area-inset-right))}
   /* tela cheia e som ficam por cima dos menus (no celular são úteis já no início) */
   body.celular .sair-btn.cheia, body.celular .sair-btn.audio{z-index:50}
@@ -380,7 +373,6 @@
 <div class="palco">
   <button class="sair-btn" id="encerrar" title="Voltar ao início">🏠</button>
   <button class="sair-btn cheia" id="btCheia" title="Tela cheia (F)">⛶</button>
-  <button class="sair-btn trapaca" id="btTrapaca" title="Trapaças (tecla H)">😈</button>
   <button class="sair-btn audio" id="btSom" title="Som (tecla M)">🔊</button>
   <div class="sandbar" id="sandbar">
     <button data-sb="caixa"   title="Soltar uma caixa">🎁</button>
@@ -471,75 +463,11 @@
     </div>
   </div>
 
-  <div class="aviso" id="telaTrapaca">
-    <div style="width:100%;max-width:420px;margin:0 auto">
-      <h3>😈 TRAPAÇAS</h3>
-
-      <div id="trapacaLogin">
-        <p class="dev-txt">Senha do desenvolvedor:</p>
-        <div class="campo-senha">
-          <input type="password" id="trapacaSenha" class="nome-input" autocomplete="off">
-          <button id="verTrapaca" class="olho">👁️</button>
-        </div>
-        <div id="trapacaErro" class="dev-erro"></div>
-        <button class="sandbox-btn" id="trapacaEntrar" style="margin-top:10px">ENTRAR</button>
-      </div>
-
-      <div id="trapacaPainel" style="display:none">
-        <p class="dev-txt" id="trapacaAlvo">contra o inimigo</p>
-        <div class="dev-botoes">
-          <button class="sandbox-btn" data-tr="dano">⚡ Tirar 50 de vida dele</button>
-          <button class="sandbox-btn" data-tr="gelo">🧊 Congelar 2 rodadas</button>
-          <button class="sandbox-btn" data-tr="veneno">☢️ Envenenar 3 rodadas</button>
-          <button class="sandbox-btn" data-tr="teleporte">🕳️ Jogar ele pro buraco</button>
-          <button class="sandbox-btn" data-tr="roubar">🔫 Zerar a munição dele</button>
-          <button class="sandbox-btn" data-tr="seca">⛽ Secar o combustível dele</button>
-          <button class="sandbox-btn" data-tr="minas">💣 Plantar 3 minas em volta</button>
-          <button class="sandbox-btn" data-tr="bombardeio">☄️ Bombardear ele agora</button>
-          <button class="sandbox-btn" data-tr="chao">🧨 Explodir o chão dele</button>
-          <button class="sandbox-btn" data-tr="roubarnuke">🥷 Roubar a nuke dele</button>
-        </div>
-        <hr class="dev-linha-fina">
-        <p class="dev-txt">pra você</p>
-        <div class="dev-botoes">
-          <button class="sandbox-btn" data-tr="curar">❤️ Encher sua vida</button>
-          <button class="sandbox-btn" data-tr="nuke">☢️ Ganhar 1 NUKE</button>
-          <button class="sandbox-btn" data-tr="escudo">🛡️ Ganhar 1 escudo</button>
-          <button class="sandbox-btn" data-tr="gasolina">⛽ Encher o combustível</button>
-          <button class="sandbox-btn" data-tr="recarregar">🔁 Recarregar todas as armas</button>
-          <button class="sandbox-btn" data-tr="escudoja">👻 Ligar escudo sem gastar turno</button>
-          <button class="sandbox-btn" data-tr="extra">🔂 Jogar duas vezes seguidas</button>
-          <button class="sandbox-btn" data-tr="caixa">🎁 Chamar uma caixa</button>
-          <button class="sandbox-btn" data-tr="chuvacaixa">🎁💯 CEM caixas em cima de você</button>
-        </div>
-        <hr class="dev-linha-fina">
-        <p class="dev-txt">no mundo</p>
-        <div class="dev-botoes">
-          <button class="sandbox-btn" data-tr="terremoto">🌋 Terremoto na hora</button>
-          <button class="sandbox-btn" data-tr="terreno">⛰️ Terreno novo</button>
-          <button class="sandbox-btn" data-tr="planeta">🪐 Trocar de planeta</button>
-        </div>
-      </div>
-
-      <button class="sandbox-btn" id="trapacaVoltar" style="margin-top:14px">← VOLTAR AO JOGO</button>
-    </div>
-  </div>
-
   <div class="aviso" id="telaDev">
     <div style="width:100%;max-width:520px;margin:0 auto">
       <h3>🔧 SALA DO DEV</h3>
 
-      <div id="devLogin">
-        <p class="dev-txt">Digite a senha:</p>
-        <div class="campo-senha">
-          <input type="password" id="devSenha" class="nome-input" autocomplete="off">
-          <button id="verSenha" class="olho" title="Mostrar a senha">👁️</button>
-        </div>
-        <div id="devErro" class="dev-erro"></div>
-        <button class="sandbox-btn" id="devEntrar" style="margin-top:12px">ENTRAR</button>
-      </div>
-
-      <div id="devPainel" style="display:none">
+      <div id="devPainel">
         <div class="dev-linha">
           <label>Gravidade <b id="vGrav">0.22</b></label>
           <input type="range" id="slGrav" min="0.02" max="0.6" step="0.01" value="0.22">
@@ -814,18 +742,8 @@ const FASES = [
     vento:2.5, grav:1,    caixas:1,   nuke:0.6,dica:"Mestre + nuke em quase toda caixa." }
 ];
 
-/* =========================================================
-   SALA DO DESENVOLVEDOR
-   Troque a senha aqui. (Leia o aviso que o Claude escreveu:
-   isto NÃO é segurança de verdade, é um segredinho do jogo.)
-   ========================================================= */
-const SENHA_DEV = "L&v!05112014";
+/* ---- sala do desenvolvedor: ajustes de gravidade, vento e caixas ---- */
 let devGrav = null, devVento = null, devCaixa = null;
-let devLiberado = false;      // senha da sala do dev (vale a sessão)
-// A senha das trapaças TRANCA de novo toda vez que a vez passa:
-// cada jogador tem que digitar na própria vez.
-let trapacaLiberada = false;
-let turnoExtra = false;   // trapaça: joga duas vezes seguidas
 
 let faseAtual = null;
 let progresso = 0;
@@ -2036,18 +1954,6 @@ function encerrarTurno(){
   }
   if(vivos().length <= 1){ terminarPartida(); return; }
 
-  if(turnoExtra){                                // trapaça do turno extra
-    turnoExtra = false;
-    jogadores[vez].comb = jogadores[vez].combMax;
-    sortearVento(); fase='mirando';
-    document.getElementById('atirar').disabled = false;
-    avisar('🔁 JOGA DE NOVO!');
-    atualizarPainel();
-    return;
-  }
-
-  trapacaLiberada = false;                       // trocou a vez? senha de novo
-  const tt = document.getElementById('telaTrapaca'); if(tt) tt.classList.remove('on');
   jogadores[vez].ang = angulo; jogadores[vez].pot = potencia; jogadores[vez].arma = armaSel;
   vez = proximoVivo(vez);
   angulo = jogadores[vez].ang; potencia = jogadores[vez].pot; armaSel = jogadores[vez].arma;
@@ -3218,8 +3124,7 @@ document.querySelectorAll('[data-sb]').forEach(b=>{
       avisar(m.nome.toUpperCase() + '!');
     }
     else if(acao === 'vez'){
-      trapacaLiberada = false;
-      jogadores[vez].ang=angulo; jogadores[vez].pot=potencia; jogadores[vez].arma=armaSel;
+        jogadores[vez].ang=angulo; jogadores[vez].pot=potencia; jogadores[vez].arma=armaSel;
       vez = proximoVivo(vez);
       angulo=jogadores[vez].ang; potencia=jogadores[vez].pot; armaSel=jogadores[vez].arma;
       montarArsenal(); avisar('AGORA É A VEZ DO OUTRO!');
@@ -3263,14 +3168,12 @@ addEventListener('keydown', e=>{
   else if(e.key==='ArrowLeft')  potencia=Math.max(5,potencia-3);
   else if(e.key===' ')     atirar();
   else if((e.key==='t'||e.key==='T') && sandbox){
-    trapacaLiberada = false;
     jogadores[vez].ang=angulo; jogadores[vez].pot=potencia; jogadores[vez].arma=armaSel;
     vez = proximoVivo(vez);
     angulo=jogadores[vez].ang; potencia=jogadores[vez].pot; armaSel=jogadores[vez].arma;
     montarArsenal(); avisar('AGORA É A VEZ DO OUTRO!');
   }
   else if(e.key==='m'||e.key==='M') alternarSom();
-  else if(e.key==='h'||e.key==='H') abrirTrapacas();
   else if(e.key==='f'||e.key==='F') alternarTelaCheia();
   else if(e.key==='e'||e.key==='E') usarEscudo();
   else if(e.key==='a'||e.key==='A') mover(-1);
@@ -3634,21 +3537,6 @@ function montarFases(){
   });
 }
 
-/* ------------------- trapaças no meio do jogo ------------------- */
-const telaTrapaca = document.getElementById('telaTrapaca');
-
-function abrirTrapacas(){
-  if(fase === 'fim') return;
-  document.getElementById('trapacaLogin').style.display  = trapacaLiberada ? 'none' : '';
-  document.getElementById('trapacaPainel').style.display = trapacaLiberada ? '' : 'none';
-  document.getElementById('trapacaSenha').value = '';
-  document.getElementById('trapacaErro').textContent = '';
-  document.getElementById('trapacaAlvo').textContent =
-    'contra ' + etiqueta(jogadores.indexOf(inimigoMaisProximo(vez))).replace(/^\S+\s/, '');
-  telaTrapaca.classList.add('on');
-}
-document.getElementById('btTrapaca').onclick = abrirTrapacas;
-
 const btSom = document.getElementById('btSom');
 function alternarSom(){
   mudo = !mudo;
@@ -3656,175 +3544,10 @@ function alternarSom(){
   if(!mudo){ ligarAudio(); som('caixa'); }
 }
 btSom.onclick = alternarSom;
-document.getElementById('trapacaVoltar').onclick = ()=> telaTrapaca.classList.remove('on');
-
-document.getElementById('verTrapaca').onclick = ()=>{
-  const c = document.getElementById('trapacaSenha');
-  c.type = c.type === 'password' ? 'text' : 'password';
-};
-function entrarTrapaca(){
-  if(document.getElementById('trapacaSenha').value.trim() === SENHA_DEV){
-    trapacaLiberada = true;
-    document.getElementById('trapacaLogin').style.display  = 'none';
-    document.getElementById('trapacaPainel').style.display = '';
-  } else {
-    document.getElementById('trapacaErro').textContent = '❌ senha errada';
-    document.getElementById('trapacaSenha').value = '';
-  }
-}
-document.getElementById('trapacaEntrar').onclick = entrarTrapaca;
-document.getElementById('trapacaSenha').onkeydown = e=>{ if(e.key === 'Enter') entrarTrapaca(); };
-
-document.querySelectorAll('[data-tr]').forEach(b=>{
-  b.onclick = ()=>{
-    if(!trapacaLiberada) return;
-    const eu = jogadores[vez], ele = inimigoMaisProximo(vez);
-    const grito = (j, txt, cor)=> flutuantes.push({x:j.x, y:j.y-70, txt, cor, vida:1.6, tam:24});
-
-    switch(b.dataset.tr){
-      case 'dano':
-        ele.vida = Math.max(0, ele.vida - 50);
-        grito(ele, '-50 😈', '#ff4d4d'); tremor = 16; break;
-      case 'gelo':
-        ele.congelado = 4; grito(ele, '🧊 CONGELADO!', '#a0e8ff'); break;
-      case 'veneno':
-        ele.veneno = 3; grito(ele, '☢️ ENVENENADO!', '#c8ff4d'); break;
-      case 'teleporte': {
-        const destino = Math.max(30, Math.min(L-30, ele.x + (Math.random()<0.5?-1:1)*280));
-        ele.x = destino; ele.y = terreno[Math.round(destino)];
-        cavar(destino, ele.y + 40, 60); assentarTanques();
-        grito(ele, '🕳️ TELETRANSPORTADO!', '#c77dff'); break;
-      }
-      case 'roubar':
-        Object.keys(ele.municao).forEach(k => ele.municao[k] = 0);
-        ele.bombonas = 0; ele.nukes = 0;
-        grito(ele, '🔫 SEM MUNIÇÃO!', '#ffb03a'); break;
-      case 'curar':
-        eu.vida = eu.vidaMax; eu.veneno = 0; eu.congelado = 0;
-        grito(eu, '❤️ VIDA CHEIA!', '#3ddc84'); break;
-      case 'nuke':
-        eu.nukes++; grito(eu, '☢️ +1 NUKE!', '#ffe066'); break;
-      case 'escudo':
-        eu.escudos++; grito(eu, '🛡️ +1 ESCUDO!', '#7ad7ff'); break;
-      case 'gasolina':
-        eu.comb = eu.combMax; grito(eu, '⛽ CHEIO!', '#ff4d4d'); break;
-
-      // ---- novas: contra ele ----
-      case 'seca':
-        ele.comb = 0; grito(ele, '⛽ TANQUE SECO!', '#ff4d4d'); break;
-      case 'minas':
-        for(const dx of [-70, 0, 70]){
-          const mx = Math.max(20, Math.min(L-20, ele.x + dx));
-          minas.push({ x:mx, y:terreno[Math.round(mx)]-6, dono:vez, arma:ARMAS[11], poder:1, piscar:0 });
-        }
-        grito(ele, '💣 MINADO!', '#c9a227'); break;
-      case 'bombardeio':
-        for(let k=-2;k<=2;k++)
-          balas.push({ x:ele.x + k*46, y:-30, vx:0, vy:1.6, vx0:0, ventoAcc:0,
-                       arma:ARMAS[16], poder:1, dono:vez, filhas:true, saiu:true, rastro:[] });
-        grito(ele, '☄️ BOMBARDEIO!', '#a0e8ff');
-        fase='voando'; document.getElementById('atirar').disabled = true; break;
-      case 'chao':
-        cavar(ele.x, terreno[Math.round(ele.x)] + 55, 85);
-        desmoronando = true; quadrosDesmoronando = 0; assentarTanques();
-        tremor = 20; grito(ele, '🧨 SUMIU O CHÃO!', '#ff8c42'); break;
-      case 'roubarnuke':
-        if(ele.nukes > 0){ ele.nukes--; eu.nukes++; grito(eu, '🥷 NUKE ROUBADA!', '#ffe066'); }
-        else grito(ele, 'ELE NÃO TEM NUKE', '#8d7fb0');
-        break;
-
-      // ---- novas: pra você ----
-      case 'recarregar':
-        arsenalDe(eu).forEach(k => { if(ARMAS[k].usos) eu.municao[k] = ARMAS[k].usos; });
-        grito(eu, '🔁 TUDO CHEIO!', '#ffb03a'); break;
-      case 'escudoja':
-        eu.escudo = true; grito(eu, '👻 ESCUDO GRÁTIS!', '#7ad7ff'); break;
-      case 'extra':
-        turnoExtra = true; grito(eu, '🔂 TURNO EXTRA!', '#3ddc84'); break;
-      case 'caixa': {
-        let r = Math.random(), soma = 0, carga = CARGAS[0];
-        for(const c of CARGAS){ soma += c.chance; if(r <= soma){ carga = c; break; } }
-        caixas.push({ x: Math.max(60, Math.min(L-60, eu.x + eu.dir*90)), y:-40, vy:0,
-                      carga, balanco:0, pousada:false });
-        grito(eu, '🎁 CAIXA CHEGANDO!', '#3ddc84'); break;
-      }
-
-      case 'chuvacaixa': {
-        for(let k=0;k<100;k++){
-          let r = Math.random(), soma = 0, carga = CARGAS[0];
-          for(const c of CARGAS){ soma += c.chance; if(r <= soma){ carga = c; break; } }
-          caixas.push({
-            x: Math.max(40, Math.min(L-40, eu.x + (Math.random()-.5)*34)),
-            y: -50 - k*13,                       // fila apertada, cai rápido em cima de você
-            vy: 2.6, carga, balanco: Math.random()*6, pousada:false
-          });
-        }
-        flutuantes.push({x:eu.x, y:eu.y-110, txt:'🎁 CHUVA DE CAIXAS!', cor:'#ffe066', vida:2.2, tam:38});
-        tremor = 14;
-        grito(eu, '100 CAIXAS!', '#3ddc84');
-        break;
-      }
-
-      // ---- novas: no mundo ----
-      case 'terremoto': {
-        let media = 0;
-        for(let x=0;x<L;x++) media += terreno[x];
-        media /= L;
-        for(let x=0;x<L;x++) terreno[x] += (media - terreno[x]) * 0.3;
-        tremor = 50; desmoronando = true; quadrosDesmoronando = 0; assentarTanques();
-        flutuantes.push({x:L/2, y:A*0.4, txt:'🌋 TERREMOTO!', cor:'#ffb03a', vida:1.6, tam:40});
-        break;
-      }
-      case 'terreno':
-        gerarTerreno(); gerarVegetacao(); minas=[]; pocas=[]; assentarTanques();
-        flutuantes.push({x:L/2, y:A*0.4, txt:'⛰️ TERRENO NOVO!', cor:'#8b7f9e', vida:1.4, tam:34});
-        break;
-      case 'planeta':
-        planetaAtual = (planetaAtual + 1) % PLANETAS.length;
-        aplicarRegras(faseAtual !== null ? FASES[faseAtual] : null);
-        gerarVegetacao();
-        flutuantes.push({x:L/2, y:A*0.35, txt:planeta().icone + ' ' + planeta().nome.toUpperCase(),
-                         cor:'#7ad7ff', vida:1.8, tam:38});
-        break;
-    }
-    montarArsenal(); atualizarPainel();
-    telaTrapaca.classList.remove('on');
-  };
-});
-
 /* ---------------- sala do desenvolvedor ---------------- */
 const telaDev = document.getElementById('telaDev');
-document.getElementById('btDev').onclick = ()=>{
-  document.getElementById('devLogin').style.display  = '';
-  document.getElementById('devPainel').style.display = 'none';
-  document.getElementById('devSenha').value = '';
-  document.getElementById('devErro').textContent = '';
-  telaDev.classList.add('on');
-};
+document.getElementById('btDev').onclick = ()=> telaDev.classList.add('on');
 document.getElementById('devVoltar').onclick = ()=> telaDev.classList.remove('on');
-
-function tentarEntrar(){
-  const digitada = document.getElementById('devSenha').value.trim();
-  if(digitada === SENHA_DEV){
-    document.getElementById('devLogin').style.display  = 'none';
-    document.getElementById('devPainel').style.display = '';
-  } else {
-    document.getElementById('devErro').textContent = '❌ senha errada';
-    document.getElementById('devSenha').value = '';
-  }
-}
-const olho = document.getElementById('verSenha');
-olho.onclick = ()=>{
-  const campo = document.getElementById('devSenha');
-  const escondida = campo.type === 'password';
-  campo.type = escondida ? 'text' : 'password';   // mostra ou esconde
-  olho.textContent = escondida ? '🙈' : '👁️';
-  olho.classList.toggle('on', escondida);
-  campo.focus();
-};
-
-document.getElementById('devEntrar').onclick = tentarEntrar;
-document.getElementById('devSenha').onkeydown = e=>{ if(e.key === 'Enter') tentarEntrar(); };
 
 const slGrav = document.getElementById('slGrav');
 const slVento = document.getElementById('slVento');
