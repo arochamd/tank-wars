@@ -3839,7 +3839,7 @@ async function mostrarRanking(){
       li.append(nome, pts); lista.appendChild(li);
     });
   }catch(e){
-    erro.textContent = '❌ Não deu para carregar. Verifique a internet e tente de novo.';
+    erro.textContent = '❌ Não deu para carregar (' + e.message + '). Tire um print e mande para o Claude.';
   }
 }
 document.getElementById('btRanking').onclick = ()=>{
