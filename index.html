@@ -1982,11 +1982,11 @@ function passoBalas(){
 // na mesma explosão, que antes travava o jogo.
 /* =========================================================
    RANKING ONLINE (Supabase)
-   A chave abaixo é a "publishable": pode ficar no jogo, porque
-   as regras da tabela deixam só ler e enviar pontuação.
+   A chave abaixo é a "anon" (pública por natureza): pode ficar no jogo,
+   porque as regras da tabela deixam só ler e enviar pontuação.
    ========================================================= */
 const SUPABASE_URL = 'https://qaempdksbdvltmydwpfv.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_Ddesz8VQH8UclSCMrT0Log_ypwoBbJP';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhZW1wZGtzYmR2bHRteWR3cGZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzODAwMzksImV4cCI6MjEwODk1NjAzOX0.nSmzUpKTn0CdIjpIB990-bIUrcxZcZr647ivL9RIq1k';
 // pontos por vitória, de acordo com o adversário mais forte da partida
 const PONTOS_POR_NIVEL = [1, 2, 3, 5];   // Fácil, Normal, Difícil, Mestre
 const PONTOS_CONTRA_HUMANO = 1;
