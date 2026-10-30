@@ -79,7 +79,7 @@
   /* estas duas telas abrem POR CIMA da tela de escolha.
      Sem isto elas abriam atrás dela e pareciam não funcionar. */
   #telaDev.on, #telaFases.on, #telaAjuda.on,
-  #telaPlacar.on, #telaCreditos.on{z-index:45}
+  #telaPlacar.on, #telaCreditos.on, #telaSuporte.on{z-index:45}
   .adversario{margin-bottom:16px}
   .adversario b{font-family:'Bungee',cursive;font-size:11px;color:#b9a7e0;letter-spacing:1px;display:block;margin-bottom:7px}
   .linha-niveis{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
@@ -182,6 +182,11 @@
   .bloco-cred h4{font-family:'Bungee',cursive;font-size:12px;letter-spacing:1px;
     color:var(--lava-clara);margin:0 0 5px}
   .bloco-cred p{margin:0;font-size:13px;line-height:1.6;color:#d6cbec}
+  .email-caixa{display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap;margin:6px 0 4px}
+  .email-caixa a{font-family:'Bungee',cursive;font-size:15px;letter-spacing:.5px;color:var(--lava-clara);
+    background:#0e0620;border:2px dashed #8d7fb0;border-radius:10px;padding:8px 12px;text-decoration:none;
+    overflow-wrap:anywhere}
+  .copiado{font-size:12px;color:var(--musgo);font-weight:700;min-height:16px}
   .tabela-placar{max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
   .linha-placar{display:flex;justify-content:space-between;align-items:center;
     background:#241443;border-radius:12px;padding:10px 16px;font-size:15px;font-weight:900}
@@ -417,6 +422,33 @@
     </div>
   </div>
 
+  <div class="aviso" id="telaSuporte">
+    <div style="width:100%">
+      <h3>🐛 SUPORTE</h3>
+      <div class="creditos-caixa">
+        <div class="bloco-cred">
+          <h4>ACHOU UM BUG?</h4>
+          <p>Mande um e-mail contando <b>o que aconteceu</b>, <b>o que você estava fazendo</b>
+          e se foi no <b>celular ou no computador</b>. Se der, mande um print da tela!</p>
+          <div class="email-caixa">
+            <a href="mailto:rocha.levig@gmail.com?subject=Bug%20no%20Tank%20Wars" id="emailSuporte">rocha.levig@gmail.com</a>
+            <button class="sandbox-btn" id="copiarEmail">📋 COPIAR</button>
+          </div>
+          <div class="copiado" id="copiadoTxt"></div>
+        </div>
+        <div class="bloco-cred">
+          <h4>ANTES DE ESCREVER, TENTE ISTO</h4>
+          <p>• <b>Sem som?</b> Toque no 🔊 e veja se o celular não está no silencioso.<br>
+          • <b>Tela estranha ou travada?</b> Recarregue a página (ou feche e abra o app).<br>
+          • <b>Os botões não cabem?</b> Jogue com o celular deitado.<br>
+          • <b>Tanques ou fases sumiram?</b> O progresso fica salvo no navegador. Se limpar os dados dele, começa do zero.<br>
+          • <b>Versão velha?</b> Abra o jogo com internet: ele se atualiza sozinho.</p>
+        </div>
+      </div>
+      <button class="sandbox-btn" id="suporteVoltar" style="margin-top:18px">← VOLTAR</button>
+    </div>
+  </div>
+
   <div class="aviso" id="telaCreditos">
     <div style="width:100%">
       <h1 class="titulao">TANK WARS</h1>
@@ -518,6 +550,7 @@
         <button class="menu-bt" id="btAjuda">📖 COMO JOGAR</button>
         <button class="menu-bt" id="btPlacar">🏆 VITÓRIAS</button>
         <button class="menu-bt" id="btCreditos">⭐ CRÉDITOS</button>
+        <button class="menu-bt" id="btSuporte">🐛 SUPORTE</button>
       </div>
       <p class="creditos">POR XSTAR</p>
     </div>
@@ -3645,6 +3678,19 @@ function montarPlacarVitorias(){
   rodape.textContent = total ? `${total} partidas disputadas` : 'nenhuma partida ainda';
   caixa.appendChild(rodape);
 }
+// ---- suporte: e-mail pra avisar de bugs ----
+document.getElementById('btSuporte').onclick = ()=>
+  document.getElementById('telaSuporte').classList.add('on');
+document.getElementById('suporteVoltar').onclick = ()=>
+  document.getElementById('telaSuporte').classList.remove('on');
+document.getElementById('copiarEmail').onclick = ()=>{
+  const email = 'rocha.levig@gmail.com', aviso = document.getElementById('copiadoTxt');
+  const ok = ()=>{ aviso.textContent = '✅ e-mail copiado!'; setTimeout(()=> aviso.textContent = '', 2500); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(email).then(ok).catch(()=>{ aviso.textContent = email; });
+  } else aviso.textContent = email;          // navegador antigo: mostra pra copiar na mão
+};
+
 document.getElementById('btCreditos').onclick = ()=>
   document.getElementById('telaCreditos').classList.add('on');
 document.getElementById('creditosVoltar').onclick = ()=>
