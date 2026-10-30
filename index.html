@@ -1937,12 +1937,12 @@ function terminarPartida(){
     : nomes[jogadores.indexOf(j)];
 
   // Só conta para desbloquear tanques a vitória do jogador humano contra
-  // computador NORMAL (nível 1). Vitória da CPU, entre humanos, ou contra
-  // Fácil/Difícil/Mestre não entra na contagem.
-  const NIVEL_NORMAL = 1;
+  // computadores de nível NORMAL para cima (Normal, Difícil, Mestre).
+  // Fácil, vitória da CPU e partida entre humanos não entram na contagem.
+  const NIVEL_MINIMO = 1;   // 0 = Fácil, 1 = Normal, 2 = Difícil, 3 = Mestre
   const cpus = jogadores.filter(j => j.ia !== null);
   const conta = !!vencedor && vencedor.ia === null
-             && cpus.length > 0 && cpus.every(j => j.ia === NIVEL_NORMAL);
+             && cpus.length > 0 && cpus.every(j => j.ia >= NIVEL_MINIMO);
 
   let liberou = null;
   if(conta){
