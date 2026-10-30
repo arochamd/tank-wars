@@ -79,7 +79,7 @@
   /* estas duas telas abrem POR CIMA da tela de escolha.
      Sem isto elas abriam atrás dela e pareciam não funcionar. */
   #telaDev.on, #telaFases.on, #telaAjuda.on,
-  #telaPlacar.on, #telaCreditos.on, #telaSuporte.on{z-index:45}
+  #telaPlacar.on, #telaCreditos.on, #telaSuporte.on, #telaRanking.on{z-index:45}
   .adversario{margin-bottom:16px}
   .adversario b{font-family:'Bungee',cursive;font-size:11px;color:#b9a7e0;letter-spacing:1px;display:block;margin-bottom:7px}
   .linha-niveis{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
@@ -190,6 +190,10 @@
   .lista-cacadores{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:5px}
   .lista-cacadores li{font-size:13px;line-height:1.4;color:#d6cbec;background:#1a0f33;border-radius:8px;padding:6px 10px}
   .lista-cacadores li b{color:#ffe066;font-family:'Bungee',cursive;font-size:12px;letter-spacing:.5px}
+  .ranking-lista{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-width:420px;margin-left:auto;margin-right:auto}
+  .ranking-lista li{display:flex;justify-content:space-between;align-items:center;background:#241443;border-radius:12px;padding:10px 16px;font-weight:900}
+  .ranking-lista li b{font-family:'Bungee',cursive;font-size:14px;letter-spacing:.5px}
+  .ranking-lista li span{font-family:'Bungee',cursive;font-size:18px;color:#ffe066}
   .tabela-placar{max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
   .linha-placar{display:flex;justify-content:space-between;align-items:center;
     background:#241443;border-radius:12px;padding:10px 16px;font-size:15px;font-weight:900}
@@ -425,6 +429,17 @@
     </div>
   </div>
 
+  <div class="aviso" id="telaRanking">
+    <div style="width:100%">
+      <h3>🌐 RANKING ONLINE</h3>
+      <p class="dev-txt">Os 10 melhores de todos os jogadores</p>
+      <ul class="ranking-lista" id="listaRanking"></ul>
+      <p class="dev-erro" id="erroRanking"></p>
+      <button class="sandbox-btn" id="rankingAtualizar" style="margin-top:12px">🔄 ATUALIZAR</button>
+      <button class="sandbox-btn" id="rankingVoltar" style="margin-top:8px">← VOLTAR</button>
+    </div>
+  </div>
+
   <div class="aviso" id="telaSuporte">
     <div style="width:100%">
       <h3>🐛 SUPORTE</h3>
@@ -561,6 +576,7 @@
         <button class="menu-bt" id="btAjuda">📖 COMO JOGAR</button>
         <button class="menu-bt" id="btPlacar">🏆 VITÓRIAS</button>
         <button class="menu-bt" id="btCreditos">⭐ CRÉDITOS</button>
+        <button class="menu-bt" id="btRanking">🌐 RANKING</button>
         <button class="menu-bt" id="btSuporte">🐛 SUPORTE</button>
       </div>
       <p class="creditos">POR XSTAR</p>
@@ -1964,6 +1980,47 @@ function passoBalas(){
 
 // Um só lugar decide o fim da partida — inclusive quando os DOIS morrem
 // na mesma explosão, que antes travava o jogo.
+/* =========================================================
+   RANKING ONLINE (Supabase)
+   A chave abaixo é a "publishable": pode ficar no jogo, porque
+   as regras da tabela deixam só ler e enviar pontuação.
+   ========================================================= */
+const SUPABASE_URL = 'https://qaempdksbdvltmydwpfv.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Ddesz8VQH8UclSCMrT0Log_ypwoBbJP';
+// pontos por vitória, de acordo com o adversário mais forte da partida
+const PONTOS_POR_NIVEL = [1, 2, 3, 5];   // Fácil, Normal, Difícil, Mestre
+const PONTOS_CONTRA_HUMANO = 1;
+
+function pontosDaVitoria(){
+  const cpus = jogadores.filter(j => j.ia !== null);
+  if(cpus.length === 0) return PONTOS_CONTRA_HUMANO;
+  return Math.max(...cpus.map(j => PONTOS_POR_NIVEL[j.ia]));
+}
+
+async function enviarPontuacao(apelido, pontos){
+  try{
+    await fetch(SUPABASE_URL + '/rest/v1/ranking', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ apelido: String(apelido).slice(0, 12).toUpperCase(), pontos })
+    });
+  }catch(e){ /* sem internet: a vitória não é enviada, mas o jogo segue */ }
+}
+
+// junta as linhas por apelido e devolve o top 10
+async function buscarRanking(){
+  const r = await fetch(SUPABASE_URL + '/rest/v1/ranking?select=apelido,pontos&limit=2000',
+                        { headers: { apikey: SUPABASE_KEY } });
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  const linhas = await r.json();
+  const soma = {};
+  for(const l of linhas) soma[l.apelido] = (soma[l.apelido] || 0) + l.pontos;
+  return Object.entries(soma)
+    .map(([apelido, pontos]) => ({ apelido, pontos }))
+    .sort((a, b) => b.pontos - a.pontos)
+    .slice(0, 10);
+}
+
 function terminarPartida(){
   som('vitoria');
   fase = 'fim';
@@ -1981,6 +2038,11 @@ function terminarPartida(){
   const cpus = jogadores.filter(j => j.ia !== null);
   const conta = !!vencedor && vencedor.ia === null
              && cpus.length > 0 && cpus.every(j => j.ia >= NIVEL_MINIMO);
+
+  // pontos do ranking online: qualquer vitória de humano (até contra Fácil)
+  if(vencedor && vencedor.ia === null){
+    enviarPontuacao(nomes[jogadores.indexOf(vencedor)] || 'JOGADOR', pontosDaVitoria());
+  }
 
   let liberou = null;
   if(conta){
@@ -3757,6 +3819,36 @@ function desenharCacadores(lista){
   });
 }
 desenharCacadores(CACADORES_DE_BUGS);
+
+// ---- ranking online ----
+async function mostrarRanking(){
+  const lista = document.getElementById('listaRanking');
+  const erro = document.getElementById('erroRanking');
+  lista.innerHTML = ''; erro.textContent = 'Carregando...';
+  try{
+    const top = await buscarRanking();
+    erro.textContent = '';
+    if(top.length === 0){
+      const li = document.createElement('li'); li.textContent = 'Ainda ninguém. Seja o primeiro!';
+      lista.appendChild(li); return;
+    }
+    top.forEach((j, i) => {
+      const li = document.createElement('li');
+      const nome = document.createElement('b'); nome.textContent = (i+1) + '. ' + j.apelido;
+      const pts = document.createElement('span'); pts.textContent = j.pontos;
+      li.append(nome, pts); lista.appendChild(li);
+    });
+  }catch(e){
+    erro.textContent = '❌ Não deu para carregar. Verifique a internet e tente de novo.';
+  }
+}
+document.getElementById('btRanking').onclick = ()=>{
+  document.getElementById('telaRanking').classList.add('on');
+  mostrarRanking();
+};
+document.getElementById('rankingAtualizar').onclick = mostrarRanking;
+document.getElementById('rankingVoltar').onclick = ()=>
+  document.getElementById('telaRanking').classList.remove('on');
 
 // ---- suporte: e-mail pra avisar de bugs ----
 document.getElementById('btSuporte').onclick = ()=>
